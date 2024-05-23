@@ -1,0 +1,45 @@
+% metavar termvar, x, y, z, f, g, ::=
+% 
+% indexvar indices, i, j, k, n ::=
+
+
+grammar
+
+program, prog :: 'prog_' ::=
+    | statement ; program                   ::   :: seq
+    {{com sequencing }}
+    | nop ;                                 ::   :: nop
+    {{com end of program }}
+
+satement :: 'stmt_' ::=
+    | let identifier : type = expr          ::   :: var_decl
+    | identifier = expr                     ::   :: var_asgn
+    | if ( expr ) { prog1 } else { prog2 }  ::   :: if
+
+expr :: 'expr_' ::=
+    | bool                                  ::   :: atom_bool
+    | number                                ::   :: atom_num
+    | string                                ::   :: atom_str
+    | identifier                            ::   :: ident
+    | expr1 op expr2                        ::   :: operator
+    | ( expr )                              :: M :: parens
+
+
+bool, b :: 'bool_' ::= 
+    {{com syntactic category of bool literals }}
+
+number, num, n, m :: 'number_' ::=
+    {{com syntactic category of number literals }}
+
+string, str, s, t :: 'string_' ::=
+    {{com syntactic category of string literals }}
+
+operator, op :: 'operator_' ::=
+    {{com syntactic category of operators }}
+
+identifier, id :: 'id_' ::=
+    {{com syntactic category of identifier }}
+
+
+% Will also put basic tokens in here
+terminals :: 'terminal_' ::=
