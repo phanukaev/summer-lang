@@ -8,5 +8,5 @@ compile:
 	tsc
 
 docker:
-	docker build -t summerlang .
-	docker run -it --rm summerlang
+	docker pull "ghcr.io/phanukaev/summer-lang:main"
+	docker run -it --rm "ghcr.io/phanukaev/summer-lang:main"
