@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
     permissions:
+      id-token: write # source here: https://docs.github.com/en/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds#generating-build-provenance-for-container-images
       contents: read
       packages: write
       attestations: write
