@@ -10,7 +10,7 @@ If you have `npm` make sure you have typescript installed
 then compile with `make compile` or compile-and-run code with `make run`.
 
 If you prefer to not modify you local system, you can use docker instead.
-Runing `make docker` will build a docker image with the required dependencies
+Running `make docker` will download a docker image with the required dependencies
 and place you inside the conatiner, where you can use `make` as above.
 
 ## More
