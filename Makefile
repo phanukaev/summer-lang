@@ -5,7 +5,7 @@ run: compile
 	node build/main.js
 
 compile:
-	tsc
+	tsc --pretty false
 
 docker:
 	docker pull "ghcr.io/phanukaev/summer-lang:main"

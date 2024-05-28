@@ -2,7 +2,7 @@
     "compilerOptions": {
         "strict": true,
         "lib": ["es2023", "dom"],
-        "target": "es2020",
+        "target": "es2022",
         "module": "nodenext",
         "declaration": true,
         "outDir": "build"
