@@ -40,12 +40,15 @@
 
 \newcommand{\ottprogram}{
 \ottrulehead{\ottnt{program}  ,\ \ottnt{prog}}{::=}{}\ottprodnewline
-\ottfirstprodline{|}{\ottkw{statement} \, \ottsym{;}  \ottnt{program}}{}{}{}{\ottcom{sequencing}}\ottprodnewline
+\ottfirstprodline{|}{\ottnt{statement}  \ottsym{;}  \ottnt{program}}{}{}{}{\ottcom{sequencing}}\ottprodnewline
+\ottprodline{|}{\ottnt{expr}  \ottsym{;}  \ottnt{program}}{}{}{}{\ottcom{the semantics of this are ``evaluate expr performing side-effects in the process'',
+          currently there are no side effects during evaluation of expressions but there will be in the future,
+          e.g. function calls are expressions and may be effectful}}\ottprodnewline
 \ottprodline{|}{\ottkw{nop} \, \ottsym{;}}{}{}{}{\ottcom{end of program}}}
 
-\newcommand{\ottsatement}{
-\ottrulehead{\ottnt{satement}}{::=}{}\ottprodnewline
-\ottfirstprodline{|}{\ottkw{let} \, \ottnt{identifier}  \ottsym{:} \, \ottkw{type} \, \ottsym{=}  \ottnt{expr}}{}{}{}{}\ottprodnewline
+\newcommand{\ottstatement}{
+\ottrulehead{\ottnt{statement}}{::=}{}\ottprodnewline
+\ottfirstprodline{|}{\ottkw{let} \, \ottnt{id_{{\mathrm{1}}}}  \ottsym{:}  \ottnt{id_{{\mathrm{2}}}}  \ottsym{=}  \ottnt{expr}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{identifier}  \ottsym{=}  \ottnt{expr}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottkw{if} \, \ottsym{(}  \ottnt{expr}  \ottsym{)}  \ottsym{\{}  \ottnt{prog_{{\mathrm{1}}}}  \ottsym{\}} \, \ottkw{else} \, \ottsym{\{}  \ottnt{prog_{{\mathrm{2}}}}  \ottsym{\}}}{}{}{}{}}
 
@@ -86,7 +89,7 @@
 \newcommand{\ottuserXXsyntax}{
 \ottrulehead{\ottnt{user\_syntax}}{::=}{}\ottprodnewline
 \ottfirstprodline{|}{\ottnt{program}}{}{}{}{}\ottprodnewline
-\ottprodline{|}{\ottnt{satement}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottnt{statement}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{expr}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{bool}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{number}}{}{}{}{}\ottprodnewline
@@ -97,7 +100,7 @@
 
 \newcommand{\ottgrammar}{\ottgrammartabular{
 \ottprogram\ottinterrule
-\ottsatement\ottinterrule
+\ottstatement\ottinterrule
 \ottexpr\ottinterrule
 \ottbool\ottinterrule
 \ottnumber\ottinterrule

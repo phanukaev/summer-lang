@@ -8,11 +8,16 @@ grammar
 program, prog :: 'prog_' ::=
     | statement ; program                   ::   :: seq
     {{com sequencing }}
+    | expr ; program                        ::   :: expr_seq
+    {{com the semantics of this are ``evaluate expr performing side-effects in the process'',
+          currently there are no side effects during evaluation of expressions but there will be in the future,
+          e.g. function calls are expressions and may be effectful }}
     | nop ;                                 ::   :: nop
     {{com end of program }}
 
-satement :: 'stmt_' ::=
-    | let identifier : type = expr          ::   :: var_decl
+statement :: 'stmt_' ::=
+    | let id1 : id2 = expr                  ::   :: var_decl
+    {{com types and variables share the same namespace }}
     | identifier = expr                     ::   :: var_asgn
     | if ( expr ) { prog1 } else { prog2 }  ::   :: if
 
@@ -21,7 +26,8 @@ expr :: 'expr_' ::=
     | number                                ::   :: atom_num
     | string                                ::   :: atom_str
     | identifier                            ::   :: ident
-    | expr1 op expr2                        ::   :: operator
+    | op expr                               ::   :: unary_operator
+    | expr1 op expr2                        ::   :: binary_operator
     | ( expr )                              :: M :: parens
 
 
