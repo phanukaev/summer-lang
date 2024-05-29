@@ -1,41 +1,47 @@
 /*** lexer module ***/
 
 // identifiers 
-class identifier_token {
-    static re: RegExp  = /[a-zA-Z]\w*/;
-    type: 'identifier';
+class Identifier {
+    static re: RegExp = /^[a-z_]\w*/;
+    type: 'id' = 'id';
     contents : string;
     constructor(s: string) {
-        this.type = 'identifier';
+        this.contents = s;
+    }
+};
+
+class TypeIdentifier {
+    static re: RegExp = /^[A-Z]\w*/;
+    type: 'type' = 'type';
+    contents : string;
+    constructor(s: string) {
         this.contents = s;
     }
 };
 
 // operators
-class operator_token {
-    static re: RegExp = /[!@#$%^&*<>?/|.-=+]+/;
-    type: 'operator';
+class Operator {
+    static re: RegExp = /^[!@$%^&*<>?/|.=+-]+/;
+    type: 'operator' = 'operator';
     contents: string;
     constructor(s: string) {
-        this.type = 'operator';
         this.contents = s;
     }
 };
 
 // number literals
-class number_token {
-    static re: RegExp = /\b[\d]+\b/;
-    type: 'number';
+class NumberLiteral {
+    static re: RegExp = /^[\d]+\b/;
+    type: 'number' = 'number';
     contents: string;
     constructor(s: string) {
-        this.type = 'number';
         this.contents = s;
     }
 };
 
 // string literals
-class string_token {
-    static re: RegExp = /\x22([\x20\x21\x23-\x7e]|\x5c\x22)*\x22"/;
+class StringLiteral {
+    static re: RegExp = /^\x22([\x20\x21\x23-\x5b\x5d-\x7e]|\x5c\x22)*\x22/;
     /*
      * 22 is the ascii hex-code for double quote.
      * matches an initial double quote, followed by a sequence of
@@ -45,136 +51,119 @@ class string_token {
      * - OR -
      * a backslash-escaped double quote (\x5c\x22)
      */
-    type: 'string';
+    type: 'string' = 'string';
     contents: string;
     constructor(s: string) {
-        this.type = 'string';
         this.contents = s;
     }
 };
 
 // boolean literals
-class boolean_token {
-    static re: RegExp = /\b(true|false)\b/;
-    type: 'boolean';
+class BooleanLiteral {
+    static re: RegExp = /^(true|false)\b/;
+    type: 'boolean' = 'boolean';
     contents: string;
     constructor(s: string) {
-        this.type = 'boolean';
         this.contents = s;
     }
 };
 
 // keywords
-class keyword_token {
-    static re: RegExp = /\b(if|else|let)\b/;
-    type: 'keyword';
+class Keyword {
+    static re: RegExp = /^(if|else|let)\b/;
+    type: 'keyword' = 'keyword';
     contents: string;
     constructor(s: string) {
-        this.type = 'keyword';
         this.contents = s;
     }
 };
 
 // special tokens
-class open_brace_token {
-    static re: RegExp = /[{]/;
-    type: 'open_brace'
-    constructor(_: string) {
-        this.type = 'open_brace';
-    }
+class OpenBrace {
+    static re: RegExp = /^[{]/;
+    type: 'open_brace' = 'open_brace';
 };
 
-class closed_brace_token {
-    static re: RegExp = /[}]/;
-    type: 'closed_brace'
-    constructor(_: string) {
-        this.type = 'closed_brace';
-    }
+class ClosedBrace {
+    static re: RegExp = /^[}]/;
+    type: 'closed_brace' = 'closed_brace';
 };
 
-class open_paren_token {
-    static re: RegExp = /[(]/;
-    type: 'open_paren'
-    constructor(_: string) {
-        this.type = 'open_paren';
-    }
+class OpenParen {
+    static re: RegExp = /^[(]/;
+    type: 'open_paren' = 'open_paren';
 };
 
-class closed_paren_token {
-    static re: RegExp = /[)]/;
-    type: 'closed_paren'
-    constructor(_: string) {
-        this.type = 'closed_paren';
-    }
+class ClosedParen {
+    static re: RegExp = /^[)]/;
+    type: 'closed_paren' = 'closed_paren'
 };
 
-class type_colon_token {
-    static re: RegExp = /:/;
-    type: 'type_colon'
-    constructor(_: string) {
-        this.type = 'type_colon';
-    }
+class TypeColon {
+    static re: RegExp = /^:/;
+    type: 'type_colon' =  'type_colon';
 };
 
-class assign_token {
-    static re: RegExp = /=/;
-    type: 'assign'
-    constructor(_: string) {
-        this.type = 'assign';
-    }
-};
-
-type token
-    = identifier_token
-    | operator_token
-    | number_token
-    | string_token
-    | boolean_token
-    | keyword_token
-    | open_brace_token
-    | closed_brace_token
-    | open_paren_token
-    | closed_paren_token
-    | type_colon_token
-    | assign_token ;
-
-const token_constructors_ordered
-    = [ assign_token
-      , type_colon_token
-      , closed_paren_token
-      , open_paren_token
-      , closed_brace_token
-      , open_brace_token
-      , keyword_token
-      , boolean_token
-      , string_token
-      , number_token
-      , operator_token
-      , identifier_token
-    ];
-
-function isolate_first_token(stream: string): [token, string]
-{
-    // regexes in the order they should be checked
-    stream = stream.trimStart();
-    for (let t of token_constructors_ordered){
-        let data = t.re.exec(stream);
-        if (data !== null){
-            const match = data[0];
-            const index = data.index;
-            const token = new t (match);
-            const new_stream = stream.slice(index);
-            return [token, new_stream];
-        }
-    }
-    throw new Error (`lexing error at:\n\t${stream.slice(0, 40)}`)
+class Semicolon {
+    static re: RegExp = /^;/;
+    type: 'semicolon' =  'semicolon';
 }
 
-export default function lex_stream (stream: string): Array<token>
+export type Token
+    = Identifier
+    | TypeIdentifier
+    | Operator
+    | NumberLiteral
+    | StringLiteral
+    | BooleanLiteral
+    | Keyword
+    | OpenBrace
+    | ClosedBrace
+    | OpenParen
+    | ClosedParen
+    | TypeColon
+    | Semicolon;
+
+/* constructors in the order they should be checked
+ * e.g. boolean literals must be checked before identifiers,
+ * since they would otherwise be lexed as identifiers
+ */
+const TokensOrdered =
+    [ Semicolon
+      , TypeColon
+      , ClosedParen
+      , OpenParen
+      , ClosedBrace
+      , OpenBrace
+      , Keyword
+      , BooleanLiteral
+      , StringLiteral
+      , NumberLiteral
+      , Operator
+      , TypeIdentifier
+      , Identifier
+    ];
+
+function isolateFirstToken(stream: string): [Token, string]
 {
-    const token_stream = new Array<token>;
+    stream = stream.trimStart();
+    for (let t of TokensOrdered){
+        let data = t.re.exec(stream);
+        if (data === null)
+            continue;
+        const match = data[0];
+        const token = new t(match);
+        const new_stream = stream.slice(match.length);
+        return [token, new_stream];
+    }
+    throw new Error (`lexing error at: ${stream.slice(0, 40)}`)
+}
+
+export function lexStream (stream: string): Array<Token>
+{
+    const token_stream = new Array<Token>;
     while (stream.length > 0){
-        const [token, new_stream] = isolate_first_token(stream);
+        const [token, new_stream] = isolateFirstToken(stream);
         token_stream.push(token);
         stream = new_stream;
     }
