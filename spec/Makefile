@@ -1,7 +1,7 @@
 name:=summer
 
-all:
-	echo development use only
+all: $(name).pdf
+
 
 $(name).tex : $(name).ott
 	ott -i $(name).ott -o $(name).tex
