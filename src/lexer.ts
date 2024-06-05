@@ -1,158 +1,59 @@
-/*** lexer module ***/
+/*** LEXER MODULE ***/
 
-// identifiers 
-class Identifier {
-    static re: RegExp = /^[a-z_]\w*/;
-    type: 'id' = 'id';
-    contents : string;
-    constructor(s: string) {
-        this.contents = s;
-    }
-};
+export type TokenKind
+    = 'semicolon' | 'typeColon'
+    | 'closeParen' | 'openParen' | 'closeBrace' | 'openBrace'
+    | 'if' | 'else' | 'let' | 'boolean' | 'string' | 'number' | 'operator'
+    | 'type' | 'id';
 
-class TypeIdentifier {
-    static re: RegExp = /^[A-Z]\w*/;
-    type: 'type' = 'type';
-    contents : string;
-    constructor(s: string) {
-        this.contents = s;
-    }
-};
-
-// operators
-class Operator {
-    static re: RegExp = /^[!@$%^&*<>?/|.=+-]+/;
-    type: 'operator' = 'operator';
-    contents: string;
-    constructor(s: string) {
-        this.contents = s;
-    }
-};
-
-// number literals
-class NumberLiteral {
-    static re: RegExp = /^[\d]+\b/;
-    type: 'number' = 'number';
-    contents: string;
-    constructor(s: string) {
-        this.contents = s;
-    }
-};
-
-// string literals
-class StringLiteral {
-    static re: RegExp = /^\x22([\x20\x21\x23-\x5b\x5d-\x7e]|\x5c\x22)*\x22/;
-    /*
-     * 22 is the ascii hex-code for double quote.
-     * matches an initial double quote, followed by a sequence of
-     * - EITHER -
-     * printable ascii characters other than the double quote
-     * (hex codes 20, 21, and 23 - 7e)
-     * - OR -
-     * a backslash-escaped double quote (\x5c\x22)
-     */
-    type: 'string' = 'string';
-    contents: string;
-    constructor(s: string) {
-        this.contents = s;
-    }
-};
-
-// boolean literals
-class BooleanLiteral {
-    static re: RegExp = /^(true|false)\b/;
-    type: 'boolean' = 'boolean';
-    contents: string;
-    constructor(s: string) {
-        this.contents = s;
-    }
-};
-
-// keywords
-class Keyword {
-    static re: RegExp = /^(if|else|let)\b/;
-    type: 'keyword' = 'keyword';
-    contents: string;
-    constructor(s: string) {
-        this.contents = s;
-    }
-};
-
-// special tokens
-class OpenBrace {
-    static re: RegExp = /^[{]/;
-    type: 'open_brace' = 'open_brace';
-};
-
-class ClosedBrace {
-    static re: RegExp = /^[}]/;
-    type: 'closed_brace' = 'closed_brace';
-};
-
-class OpenParen {
-    static re: RegExp = /^[(]/;
-    type: 'open_paren' = 'open_paren';
-};
-
-class ClosedParen {
-    static re: RegExp = /^[)]/;
-    type: 'closed_paren' = 'closed_paren'
-};
-
-class TypeColon {
-    static re: RegExp = /^:/;
-    type: 'type_colon' =  'type_colon';
-};
-
-class Semicolon {
-    static re: RegExp = /^;/;
-    type: 'semicolon' =  'semicolon';
-}
-
-export type Token
-    = Identifier
-    | TypeIdentifier
-    | Operator
-    | NumberLiteral
-    | StringLiteral
-    | BooleanLiteral
-    | Keyword
-    | OpenBrace
-    | ClosedBrace
-    | OpenParen
-    | ClosedParen
-    | TypeColon
-    | Semicolon;
-
-/* constructors in the order they should be checked
+/* Map assigning to each TokenKind its matching RegExp.
+ * They appear in the order they should be checked by the tokenizer,
  * e.g. boolean literals must be checked before identifiers,
  * since they would otherwise be lexed as identifiers
  */
-const TokensOrdered =
-    [ Semicolon
-      , TypeColon
-      , ClosedParen
-      , OpenParen
-      , ClosedBrace
-      , OpenBrace
-      , Keyword
-      , BooleanLiteral
-      , StringLiteral
-      , NumberLiteral
-      , Operator
-      , TypeIdentifier
-      , Identifier
-    ];
+const tokenRegexps : [TokenKind, RegExp][] =
+    [ ['semicolon', /^;/]
+      , ['typeColon', /^:/]
+      , ['closeParen', /^[)]/]
+      , ['openParen', /^[(]/]
+      , ['closeBrace', /^[}]/]
+      , ['openBrace', /^[{]/]
+      , ['if', /^if\b/]
+      , ['else', /^else\b/]
+      , ['let', /^let\b/]
+      , ['boolean', /^(true|false)\b/]
+      , ['string', /^\x22([\x20\x21\x23-\x5b\x5d-\x7e]|\x5c\x22)*\x22/]
+      /* 22 is the ascii hex-code for double quote.
+       * matches an initial double quote, followed by a sequence of
+       * - EITHER -
+       * printable ascii characters other than the double quote
+       * (hex codes 20, 21, and 23 - 7e)
+       * - OR -
+       * a backslash-escaped double quote (\x5c\x22)
+       */
+      , ['number', /^[\d]+\b/]
+      , ['operator', /^[!@$%^&*<>?/|.=+-]+/]
+      , ['type', /^[A-Z]\w*/]
+      , ['id', /^[a-z_]\w*/]
+    ]
+
+export type Token = {
+    kind: TokenKind;
+    contents: string;
+}
+
+export function Token(kind: Token['kind'], contents: Token['contents']){
+    return {kind, contents};
+}
 
 function isolateFirstToken(stream: string): [Token, string]
 {
-    stream = stream.trimStart();
-    for (let t of TokensOrdered){
-        let data = t.re.exec(stream);
+    for (let [kind, re] of tokenRegexps){
+        let data = re.exec(stream);
         if (data === null)
             continue;
         const match = data[0];
-        const token = new t(match);
+        const token = Token(kind, match);
         const new_stream = stream.slice(match.length);
         return [token, new_stream];
     }
@@ -162,10 +63,12 @@ function isolateFirstToken(stream: string): [Token, string]
 export function lexStream (stream: string): Array<Token>
 {
     const token_stream = new Array<Token>;
+    stream = stream.trimStart();
     while (stream.length > 0){
         const [token, new_stream] = isolateFirstToken(stream);
         token_stream.push(token);
         stream = new_stream;
+        stream = stream.trimStart();
     }
     return token_stream;
 }
