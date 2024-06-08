@@ -7,7 +7,7 @@ import { Token, lexStream } from './lexer.js';
 
 export type Declare = {
     kind: 'declare';
-    taget: string;
+    target: string;
     type: string;
     val: Expr;
 }
@@ -40,10 +40,10 @@ function parseAssign(a: PreAssign): Assign{
 }
 
 function parseDeclare(d: PreDeclare): Declare{
-    const taget = d.target;
+    const target = d.target;
     const val = parseExpr(d.val);
     const type = d.type;
-    return { kind: 'declare', taget, val, type };
+    return { kind: 'declare', target, val, type };
 }
 
 function parseStatement(s: PreStatement){

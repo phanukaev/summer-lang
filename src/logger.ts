@@ -1,19 +1,12 @@
-/* simple function to print an entrire parse tree to console
- * x: any is probably a worst practice, but whatever
- */
-export function logTree (x: any): void
-{
-    if (typeof x !== 'object'){
-        console.log(x);
-        return;
-    }
-    console.group(x.kind);
-    for(let t in x){
-        if (t !== 'kind'){ 
-            console.group(t);
-            logTree(x[t]);
-            console.groupEnd();
-        }
-    }
-    console.groupEnd();
+
+export function logObject(x: any): void{
+    const s = JSON.stringify(x, null, 2);
+    console.log(s);
 }
+
+Object.defineProperty(BigInt.prototype, 'toJSON', {
+    value: function() { return this.toString(); },
+    configurable: true,
+    enumerable: false,
+    writable: true
+});
