@@ -23,7 +23,7 @@ const tokenRegexps : [TokenKind, RegExp][] =
       , ['let', /^let\b/]
       , ['boolean', /^(true|false)\b/]
       , ['string', /^\x22([\x20\x21\x23-\x5b\x5d-\x7e]|\x5c\x22)*\x22/]
-      /* 22 is the ascii hex-code for double quote.
+      /* 0x22 is the ascii hex-code for double quote.
        * matches an initial double quote, followed by a sequence of
        * - EITHER -
        * printable ascii characters other than the double quote
