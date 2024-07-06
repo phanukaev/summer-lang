@@ -49,12 +49,35 @@ function matchBrackets(ts: Token[]): Brackets
     return out;
 }
 
-export type PreExpr = {kind: 'preExpr'; val: Array<Token|Brackets>;}
-export type PreDeclare = {kind: 'preDeclare'; type: string; target: string; val: PreExpr;}
-export type PreAssign = {kind: 'preAsgn'; target: string; val: PreExpr;}
-export type PreIfStatement = {kind: 'preIf'; condition: PreExpr;
-                              trueBranch: PreProgram; falseBranch: PreProgram;}
-export type PreStatement = PreDeclare | PreAssign | PreIfStatement | PreExpr;
+export type PreExpr = {
+    kind: 'preExpr';
+    val: Array<Token|Brackets>;
+}
+export type PreDeclare = {
+    kind: 'preDeclare';
+    type: string;
+    target: string;
+    val: PreExpr;
+}
+export type PreAssign = {
+    kind: 'preAsgn';
+    target: string;
+    val: PreExpr;
+}
+export type PreIfStatement = {
+    kind: 'preIf';
+    condition: PreExpr;
+
+    trueBranch: PreProgram;
+    falseBranch: PreProgram;
+}
+export type PreWhileLoop = {
+    kind: 'preWhile';
+    condition: PreExpr;
+    body: PreProgram;
+}
+export type PreStatement =
+    PreDeclare | PreAssign | PreIfStatement | PreExpr | PreWhileLoop;
 export type PreProgram = Array<PreStatement>; 
 
 function splitPreDeclare(ts: Array<Token|Brackets>):
@@ -76,6 +99,7 @@ function splitPreDeclare(ts: Array<Token|Brackets>):
          type: ts[3].contents, val};
     return [firstPreStatement, remainder];
 }
+
 function splitPreIfStatement(ts: Array<Token|Brackets>):
 [PreIfStatement, Array<Token|Brackets>]
 {
@@ -92,6 +116,22 @@ function splitPreIfStatement(ts: Array<Token|Brackets>):
         }
     return [firstPreStatement, ts.slice(5)];
 }
+
+function splitPreWhileLoop(ts: Array<Token|Brackets>):
+[PreWhileLoop, Array<Token|Brackets>]
+{
+    if(ts[1].kind !== 'paren' || ts[2].kind !== 'brace'){
+        console.error(ts.slice(1,3));
+        throw new Error('parse error in while loop');
+    }
+    const firstPreStatement: PreWhileLoop =
+        { kind: 'preWhile',
+          condition: {kind: 'preExpr', val: ts[1].kids},
+          body: splitPreStatements(ts[2].kids)
+        };
+    return [firstPreStatement, ts.slice(3)];
+}
+
 function splitPreAssign(ts: Array<Token|Brackets>):
 [PreAssign, Array<Token|Brackets>]
 {
@@ -122,6 +162,7 @@ function splitFirstStatement(ts: Array<Token|Brackets>):
     if(ts.length === 0) throw new Error;
     if(ts[0].kind === 'let') return splitPreDeclare(ts);
     if(ts[0].kind === 'if') return splitPreIfStatement(ts);
+    if(ts[0].kind === 'while') return splitPreWhileLoop(ts);
 
     if(ts.length === 1) return[{kind: 'preExpr', val: ts}, []];
     // a single token which thus should be an expression

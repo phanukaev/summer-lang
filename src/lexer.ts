@@ -3,7 +3,8 @@
 export type TokenKind
     = 'semicolon' | 'typeColon'
     | 'closeParen' | 'openParen' | 'closeBrace' | 'openBrace'
-    | 'if' | 'else' | 'let' | 'boolean' | 'string' | 'number' | 'operator'
+    | 'if' | 'else' | 'while'
+    | 'let' | 'boolean' | 'string' | 'number' | 'operator'
     | 'type' | 'id';
 
 /* Map assigning to each TokenKind its matching RegExp.
@@ -20,6 +21,7 @@ const tokenRegexps : [TokenKind, RegExp][] =
       , ['openBrace', /^[{]/]
       , ['if', /^if\b/]
       , ['else', /^else\b/]
+      , ['while', /^while\b/]
       , ['let', /^let\b/]
       , ['boolean', /^(true|false)\b/]
       , ['string', /^\x22([\x20\x21\x23-\x5b\x5d-\x7e]|\x5c\x22)*\x22/]
