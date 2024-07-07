@@ -65,7 +65,7 @@ function parseStatement(s: PreStatement){
         case 'preWhile': return parseWhile(s);
     }
 }
-function parseProgram(prog: PreProgram): Program{
+export function parseProgram(prog: PreProgram): Program{
     return prog.map(s => parseStatement(s));
 }
 

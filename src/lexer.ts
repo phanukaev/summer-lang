@@ -1,7 +1,7 @@
 /*** LEXER MODULE ***/
 
 export type TokenKind
-    = 'semicolon' | 'typeColon'
+    = 'semicolon' | 'typeColon' | 'comma' | 'typeArrow' | 'lambdaArrow'
     | 'closeParen' | 'openParen' | 'closeBrace' | 'openBrace'
     | 'if' | 'else' | 'while'
     | 'let' | 'boolean' | 'string' | 'number' | 'operator'
@@ -15,6 +15,9 @@ export type TokenKind
 const tokenRegexps : [TokenKind, RegExp][] =
     [ ['semicolon', /^;/]
       , ['typeColon', /^:/]
+      , ['comma', /^,/]
+      , ['typeArrow', /^->/]
+      , ['lambdaArrow', /^=>/]
       , ['closeParen', /^[)]/]
       , ['openParen', /^[(]/]
       , ['closeBrace', /^[}]/]

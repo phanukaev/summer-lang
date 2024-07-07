@@ -171,7 +171,7 @@ function splitFirstStatement(ts: Array<Token|Brackets>):
     return splitPreExpr(ts);
 }
 
-function splitPreStatements(b: Array<Token|Brackets>): PreProgram
+export function splitPreStatements(b: Array<Token|Brackets>): PreProgram
 {
     let p = [];
     while(b.length > 0){
