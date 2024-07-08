@@ -35,33 +35,36 @@
 \newcommand{\ottafterlastrule}{\\}
 \newcommand{\ottmetavars}{
 \ottmetavartabular{
-
+ $ \ottmv{indices} ,\, \ottmv{i} ,\, \ottmv{j} ,\, \ottmv{k} ,\, \ottmv{n} $ &  \\
 }}
 
 \newcommand{\ottprogram}{
 \ottrulehead{\ottnt{program}  ,\ \ottnt{prog}}{::=}{}\ottprodnewline
 \ottfirstprodline{|}{\ottnt{statement}  \ottsym{;}  \ottnt{program}}{}{}{}{\ottcom{sequencing}}\ottprodnewline
 \ottprodline{|}{\ottnt{expr}  \ottsym{;}  \ottnt{program}}{}{}{}{\ottcom{the semantics of this are ``evaluate expr performing
-        side-effects in the process'', currently there are no side effects
-        during evaluation of expressions but there will be in the future,
-        e.g. function calls are expressions and may be effectful}}\ottprodnewline
+    side-effects in the process'', currently there are no side effects
+    during evaluation of expressions but there will be in the future,
+    e.g. function calls are expressions and may be effectful}}\ottprodnewline
 \ottprodline{|}{\ottkw{nop} \, \ottsym{;}}{}{}{}{\ottcom{end of program}}}
 
 \newcommand{\ottstatement}{
 \ottrulehead{\ottnt{statement}}{::=}{}\ottprodnewline
 \ottfirstprodline{|}{\ottkw{let} \, \ottnt{id}  \ottsym{:}  \ottnt{type}  \ottsym{=}  \ottnt{expr}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{identifier}  \ottsym{=}  \ottnt{expr}}{}{}{}{}\ottprodnewline
-\ottprodline{|}{\ottkw{if} \, \ottsym{(}  \ottnt{expr}  \ottsym{)}  \ottsym{\{}  \ottnt{prog_{{\mathrm{1}}}}  \ottsym{\}} \, \ottkw{else} \, \ottsym{\{}  \ottnt{prog_{{\mathrm{2}}}}  \ottsym{\}}}{}{}{}{}}
+\ottprodline{|}{\ottkw{if} \, \ottsym{(}  \ottnt{expr}  \ottsym{)}  \ottsym{\{}  \ottnt{prog_{{\mathrm{1}}}}  \ottsym{\}} \, \ottkw{else} \, \ottsym{\{}  \ottnt{prog_{{\mathrm{2}}}}  \ottsym{\}}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottkw{while} \, \ottsym{(}  \ottnt{expr}  \ottsym{)}  \ottsym{\{}  \ottnt{prog}  \ottsym{]}}{}{}{}{}}
 
 \newcommand{\ottexpr}{
-\ottrulehead{\ottnt{expr}}{::=}{}\ottprodnewline
+\ottrulehead{\ottnt{expr}  ,\ \ottnt{e}  ,\ \ottnt{f}}{::=}{}\ottprodnewline
 \ottfirstprodline{|}{\ottnt{bool}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{number}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{string}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{identifier}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{op} \, \ottnt{expr}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{expr_{{\mathrm{1}}}} \, \ottnt{op} \, \ottnt{expr_{{\mathrm{2}}}}}{}{}{}{}\ottprodnewline
-\ottprodline{|}{\ottsym{(}  \ottnt{expr}  \ottsym{)}} {\textsf{M}}{}{}{}}
+\ottprodline{|}{\ottsym{(}  \ottnt{expr}  \ottsym{)}} {\textsf{M}}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottsym{(}  \ottnt{id_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottnt{id_{\ottmv{n}}}  \ottsym{)}  \Rightarrow  \ottsym{\{}  \ottnt{prog}  \ottsym{\}}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottnt{f}  \ottsym{(}  \ottnt{e_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottnt{e_{\ottmv{n}}}  \ottsym{)}}{}{}{}{}}
 
 \newcommand{\ottbool}{
 \ottrulehead{\ottnt{bool}  ,\ \ottnt{b}}{::=}{\ottcom{syntactic category of bool literals}}}
@@ -70,7 +73,7 @@
 \ottrulehead{\ottnt{number}  ,\ \ottnt{num}  ,\ \ottnt{n}  ,\ \ottnt{m}}{::=}{\ottcom{syntactic category of number literals}}}
 
 \newcommand{\ottstring}{
-\ottrulehead{\ottnt{string}  ,\ \ottnt{str}  ,\ \ottnt{s}  ,\ \ottnt{t}}{::=}{\ottcom{syntactic category of string literals}}}
+\ottrulehead{\ottnt{string}  ,\ \ottnt{str}  ,\ \ottnt{s}}{::=}{\ottcom{syntactic category of string literals}}}
 
 \newcommand{\ottoperator}{
 \ottrulehead{\ottnt{operator}  ,\ \ottnt{op}}{::=}{\ottcom{syntactic category of operators}}}
@@ -78,11 +81,18 @@
 \newcommand{\ottidentifier}{
 \ottrulehead{\ottnt{identifier}  ,\ \ottnt{id}}{::=}{\ottcom{syntactic category of identifier}}}
 
+\newcommand{\otttypename}{
+\ottrulehead{\ottnt{typename}  ,\ \tau}{::=}{\ottcom{syntactic category of type identifiers}}}
+
 \newcommand{\otttype}{
-\ottrulehead{\ottnt{type}  ,\ \ottnt{tid}}{::=}{\ottcom{syntactic category of type identifiers}}}
+\ottrulehead{\ottnt{type}  ,\ \ottnt{T}}{::=}{}\ottprodnewline
+\ottfirstprodline{|}{\tau}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottsym{(}  \ottnt{T_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottnt{T_{\ottmv{n}}}  \ottsym{)}  \rightarrow  \ottnt{T}}{}{}{}{}}
 
 \newcommand{\ottterminals}{
-\ottrulehead{\ottnt{terminals}}{::=}{}}
+\ottrulehead{\ottnt{terminals}}{::=}{}\ottprodnewline
+\ottfirstprodline{|}{ \rightarrow }{}{}{}{}\ottprodnewline
+\ottprodline{|}{ \Rightarrow }{}{}{}{}}
 
 \newcommand{\ottformula}{
 \ottrulehead{\ottnt{formula}}{::=}{}\ottprodnewline
@@ -93,7 +103,8 @@
 
 \newcommand{\ottuserXXsyntax}{
 \ottrulehead{\ottnt{user\_syntax}}{::=}{}\ottprodnewline
-\ottfirstprodline{|}{\ottnt{program}}{}{}{}{}\ottprodnewline
+\ottfirstprodline{|}{\ottmv{indices}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottnt{program}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{statement}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{expr}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{bool}}{}{}{}{}\ottprodnewline
@@ -101,6 +112,7 @@
 \ottprodline{|}{\ottnt{string}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{operator}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{identifier}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottnt{typename}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{type}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottnt{terminals}}{}{}{}{}}
 
@@ -113,6 +125,7 @@
 \ottstring\ottinterrule
 \ottoperator\ottinterrule
 \ottidentifier\ottinterrule
+\otttypename\ottinterrule
 \otttype\ottinterrule
 \ottterminals\ottinterrule
 \ottformula\ottinterrule

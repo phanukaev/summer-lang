@@ -1,5 +1,7 @@
+import { assert } from './util.js';
 import {Token} from './lexer.js';
-type Brackets = {
+
+export type Brackets = {
     kind: 'top' | 'paren' | 'brace';
     kids: Array<Token|Brackets>;
 }
@@ -55,7 +57,7 @@ export type PreExpr = {
 }
 export type PreDeclare = {
     kind: 'preDeclare';
-    type: string;
+    type: Array<Token|Brackets>;
     target: string;
     val: PreExpr;
 }
@@ -83,20 +85,21 @@ export type PreProgram = Array<PreStatement>;
 function splitPreDeclare(ts: Array<Token|Brackets>):
 [PreDeclare, Array<Token|Brackets>]
 {
-    if (ts[0].kind !== 'let' ||
-        ts[1].kind !== 'id' || ts[2].kind !== 'typeColon' ||
-        ts[3].kind !== 'type' ||
-        !(ts[4].kind === 'operator' && ts[4].contents === '='))
-    {
-        /* after let we expect an identifier, then colon, then type,
-         * then assignment operator */
-        console.error(ts.slice(0,5));
-        throw new Error('parse error in variable declaration');
+    assert(ts[0].kind === 'let' && ts[1].kind === 'id'
+        && ts[2].kind === 'typeColon',
+           `parse error in variable declaration ${ts}`);
+           
+    const typeSig: Array<Token|Brackets> = [];
+    let i = 3;
+    while(true){
+        let t = ts[i];
+        if(t.kind === 'operator' && t.contents === '=') break;
+        typeSig.push(t);
+        i++;
     }
-    const [val, remainder] = splitPreExpr(ts.slice(5));
+    const [val, remainder] = splitPreExpr(ts.slice(i+1));
     const firstPreStatement: PreDeclare =
-        {kind: 'preDeclare', target: ts[1].contents,
-         type: ts[3].contents, val};
+        {kind: 'preDeclare', target: ts[1].contents, type: typeSig, val};
     return [firstPreStatement, remainder];
 }
 

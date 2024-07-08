@@ -1,6 +1,6 @@
 % metavar termvar, x, y, z, f, g, ::=
 % 
-% indexvar indices, i, j, k, n ::=
+indexvar indices, i, j, k, n ::=
 
 
 grammar
@@ -10,9 +10,9 @@ program, prog :: 'prog_' ::=
     {{com sequencing }}
     | expr ; program                        ::   :: expr_seq
     {{com the semantics of this are ``evaluate expr performing
-        side-effects in the process'', currently there are no side effects
-        during evaluation of expressions but there will be in the future,
-        e.g. function calls are expressions and may be effectful }}
+    side-effects in the process'', currently there are no side effects
+    during evaluation of expressions but there will be in the future,
+    e.g. function calls are expressions and may be effectful }}
     | nop ;                                 ::   :: nop
     {{com end of program }}
 
@@ -20,8 +20,9 @@ statement :: 'stmt_' ::=
     | let id : type = expr                  ::   :: var_decl
     | identifier = expr                     ::   :: var_asgn
     | if ( expr ) { prog1 } else { prog2 }  ::   :: if
+    | while ( expr ) { prog ]               ::   :: while
 
-expr :: 'expr_' ::=
+expr, e, f :: 'expr_' ::=
     | bool                                  ::   :: atom_bool
     | number                                ::   :: atom_num
     | string                                ::   :: atom_str
@@ -29,6 +30,8 @@ expr :: 'expr_' ::=
     | op expr                               ::   :: unary_operator
     | expr1 op expr2                        ::   :: binary_operator
     | ( expr )                              :: M :: parens
+    | ( id1 , .. , idn ) => { prog }        ::   :: lambda
+    | f ( e1 , .. , en )                    ::   :: function_call
 
 
 bool, b :: 'bool_' ::= 
@@ -37,7 +40,7 @@ bool, b :: 'bool_' ::=
 number, num, n, m :: 'number_' ::=
     {{com syntactic category of number literals }}
 
-string, str, s, t :: 'string_' ::=
+string, str, s :: 'string_' ::=
     {{com syntactic category of string literals }}
 
 operator, op :: 'operator_' ::=
@@ -46,8 +49,16 @@ operator, op :: 'operator_' ::=
 identifier, id :: 'id_' ::=
     {{com syntactic category of identifier }}
 
-type, tid :: 'tid_' ::=
-      {{com syntactic category of type identifiers }}
+typename, t {{tex \tau }} :: 'typename_' ::=
+    {{com syntactic category of type identifiers }}
+
+type, T :: 'type_' ::=
+     | t                                    ::   :: type_name
+     | ( T1 , .. , Tn )  -> T               ::   :: function_type
 
 % Will also put basic tokens in here
 terminals :: 'terminal_' ::=
+    | ->                                    ::   :: function_type_arrow
+    {{tex \rightarrow }}
+    | =>                                    ::   :: lambda_arrow
+    {{tex \Rightarrow }}

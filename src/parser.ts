@@ -3,11 +3,12 @@ import { PreProgram, PreIfStatement, PreAssign, PreDeclare, PreStatement,
          PreWhileLoop, parsePreProgram
        } from './pre_program_parser.js';
 import { Token, lexStream } from './lexer.js';
+import { TypeSignature } from './types.js';
 
 export type Declare = {
     kind: 'declare';
     target: string;
-    type: string;
+    type: TypeSignature;
     val: Expr;
 }
 export type Assign = {
