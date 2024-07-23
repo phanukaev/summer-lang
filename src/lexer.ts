@@ -3,7 +3,7 @@
 export type TokenKind
     = 'semicolon' | 'typeColon' | 'comma' | 'typeArrow' | 'lambdaArrow'
     | 'closeParen' | 'openParen' | 'closeBrace' | 'openBrace'
-    | 'if' | 'else' | 'while'
+    | 'if' | 'else' | 'while' | 'return'
     | 'let' | 'boolean' | 'string' | 'number' | 'operator'
     | 'type' | 'id';
 
@@ -26,6 +26,7 @@ const tokenRegexps : [TokenKind, RegExp][] =
       , ['else', /^else\b/]
       , ['while', /^while\b/]
       , ['let', /^let\b/]
+      , ['return', /^return\b/]
       , ['boolean', /^(true|false)\b/]
       , ['string', /^\x22([\x20\x21\x23-\x5b\x5d-\x7e]|\x5c\x22)*\x22/]
       /* 0x22 is the ascii hex-code for double quote.

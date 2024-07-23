@@ -4,6 +4,9 @@ all:
 run: compile
 	node build/main.js
 
+output.json: compile
+	node build/main.js > output.json
+
 compile:
 	tsc --pretty false
 

@@ -1,14 +1,15 @@
+import { assert } from './util.js';
 import { Expr, parseExpr } from './expr_parser.js';
 import { PreProgram, PreIfStatement, PreAssign, PreDeclare, PreStatement,
-         PreWhileLoop, parsePreProgram
+         PreWhileLoop, PreReturn, parsePreProgram
        } from './pre_program_parser.js';
 import { Token, lexStream } from './lexer.js';
-import { TypeSignature } from './types.js';
+import { TypeSignature, parseTypeSig } from './types.js';
 
 export type Declare = {
     kind: 'declare';
     target: string;
-    type: TypeSignature;
+    typeSignature: TypeSignature;
     val: Expr;
 }
 export type Assign = {
@@ -28,7 +29,12 @@ export type WhileLoop = {
     body: Program;
 }
 
-export type Statement = Declare | Assign | IfStatement | Expr | WhileLoop;
+export type Return = {
+    kind: 'return';
+    val: Expr | 'VOID';
+}
+
+export type Statement = Declare | Assign | IfStatement | Expr | WhileLoop | Return;
 export type Program = Array<Statement>;
 
 function parseIfStatement(s: PreIfStatement): IfStatement{
@@ -53,8 +59,13 @@ function parseAssign(a: PreAssign): Assign{
 function parseDeclare(d: PreDeclare): Declare{
     const target = d.target;
     const val = parseExpr(d.val);
-    const type = d.type;
-    return { kind: 'declare', target, val, type };
+    const typeSignature = parseTypeSig(d.type);
+    return { kind: 'declare', target, val, typeSignature };
+}
+
+function parseReturn(d: PreReturn): Return {
+    return { kind: 'return',
+             val: d.val === 'VOID' ? 'VOID' : parseExpr(d.val) };
 }
 
 function parseStatement(s: PreStatement){
@@ -64,6 +75,7 @@ function parseStatement(s: PreStatement){
         case 'preDeclare': return parseDeclare(s);
         case 'preExpr': return parseExpr(s);
         case 'preWhile': return parseWhile(s);
+        case 'preReturn': return parseReturn(s);
     }
 }
 export function parseProgram(prog: PreProgram): Program{

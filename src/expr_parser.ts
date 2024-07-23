@@ -6,15 +6,12 @@ import { splitArray, assert } from './util.js';
 export type StringLit = {kind: 'stringLit'; value: string;}
 export type IntLit = {kind: 'intLit'; value: bigint;}
 export type BoolLit = {kind: 'boolLit'; value: boolean;}
-export type UnOpExpr = {kind: 'unOpExpr'; op: string; expr: Expr;}
-export type BinOpExpr = {
-    kind: 'binOpExpr'; op: string; expr1: Expr; expr2: Expr;
-}
 export type Identifier = {kind: 'identifier'; name: string;}
-export type Funcall = {kind: 'funcall'; fun: Expr, args: Expr[];}
-export type Function = {kind: 'function'; args: Identifier[]; body: Program };
+export type Funcall = {kind: 'funcall'; fun: Identifier, args: Expr[];}
+export type Function = {kind: 'function'; args: Identifier[]; body: Program }
+
 export type Expr = BoolLit | IntLit | StringLit
-    | Identifier | UnOpExpr | BinOpExpr | Funcall | Function;
+    | Identifier | Funcall | Function;
 
 export function parseExpr(e: PreExpr): Expr
 {
@@ -46,23 +43,25 @@ export function parseExpr(e: PreExpr): Expr
     }
     // if the first token is an operator, apply it and parse the rest.
     if (v[0].kind === 'operator') {
-        const op = v[0].contents;
+        const functionName : Identifier = {
+            kind: 'identifier',
+            name: 'operator' + v[0].contents
+        }
         const remainder = { kind: 'preExpr' as 'preExpr', val : v.slice(1) };
-        return { kind: 'unOpExpr', op, expr: parseExpr(remainder)};
+        const funcall : Funcall =
+            { kind: 'funcall',
+              fun: functionName,
+              args: [parseExpr(remainder)]
+            }
+        return funcall;
     }
-    if (v.length === 2 &&
-        (v[0].kind === 'paren' || v[0].kind === 'id')
+    if (v.length === 2 && v[0].kind === 'id'
         && v[1].kind === 'paren'){
         /* An expression with exactly two tokens, and the first is not an
-         * operator. Thus, a function call.  This does mean that inline
-         * lambdas must be enclosed in parentheses.
+         * operator. Thus, a function call. Inline lambdas are currently
+         * not allowed.
          */
-        const fun : Expr = (() => {
-            if (v[0].kind === 'id')
-                return { kind: 'identifier', name: v[0].contents }
-            assert(v[0].kind === 'paren');
-            return parseExpr({kind: 'preExpr', val: v[0].kids});
-        })();
+        const fun : Identifier = { kind: 'identifier', name: v[0].contents }
         const args = splitArray(v[1].kids, t => t.kind === 'comma')
             .map(x => parseExpr({kind: 'preExpr', val: x}));
         return {kind: 'funcall', fun, args};
@@ -72,8 +71,10 @@ export function parseExpr(e: PreExpr): Expr
     {
         // the expression is a lambda
         v[0].kids.forEach(t =>
-            assert(t.kind !== 'comma' && t.kind !== 'id',
-                   `function expression malformed parameter list:\n${t}`));
+            assert(
+                t.kind === 'comma' || t.kind === 'id',
+                `function expression malformed parameter list:\n${JSON.stringify(t, null, 2)}`
+            ));
 
         const args: Identifier[] = v[0].kids
             .filter(t => t.kind === 'id')
@@ -85,7 +86,7 @@ export function parseExpr(e: PreExpr): Expr
     // find the location of the least-precedence binary operator
     let idx = -1;
     let precedence = Infinity;
-    let op = '';
+    let op = null;
     for(let i = 0; i < v.length; i++){
         const t = v[i];
         if(t.kind === 'operator' &&
@@ -94,12 +95,18 @@ export function parseExpr(e: PreExpr): Expr
         {
             idx = i;
             precedence = binOpTable[t.contents];
-            op = t.contents;
+            op = 'operator'+t.contents;
         }
     }
-    if(idx < 1)
-        throw new Error(`parse error in expression ${e}`);
+    assert(op !== null);
+    if(idx < 1){
+        throw new Error(`parse error in expression ${JSON.stringify(e, undefined, 2)}`);
+    }
     const expr1 = parseExpr({kind: 'preExpr', val: v.slice(0, idx)});
     const expr2 = parseExpr({kind: 'preExpr', val: v.slice(idx+1)});
-    return {kind: 'binOpExpr', op, expr1, expr2};
+    return {
+        kind: 'funcall',
+        fun: { kind: 'identifier', name: op },
+        args: [expr1, expr2]
+    }
 }

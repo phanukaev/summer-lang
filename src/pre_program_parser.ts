@@ -78,8 +78,15 @@ export type PreWhileLoop = {
     condition: PreExpr;
     body: PreProgram;
 }
+export type PreReturn = {
+    kind: 'preReturn';
+    val: PreExpr | 'VOID';
+}
+
 export type PreStatement =
-    PreDeclare | PreAssign | PreIfStatement | PreExpr | PreWhileLoop;
+    PreDeclare | PreAssign | PreIfStatement
+    | PreExpr | PreWhileLoop | PreReturn;
+
 export type PreProgram = Array<PreStatement>; 
 
 function splitPreDeclare(ts: Array<Token|Brackets>):
@@ -150,6 +157,17 @@ function splitPreAssign(ts: Array<Token|Brackets>):
     return [asgn, remainder];
 }
 
+function splitPreReturn(ts: Array<Token|Brackets>):
+[PreReturn, Array<Token|Brackets>]
+{
+    if(ts[1].kind === 'semicolon'){
+        return [{kind: 'preReturn', val: 'VOID'},
+                ts.slice(2)];
+    }
+    let [val, remainder] = splitPreExpr(ts.slice(1));
+    return [{kind: 'preReturn', val}, remainder ];
+}
+
 function splitPreExpr(ts: Array<Token|Brackets>):
 [PreExpr, Array<Token|Brackets>]
 {
@@ -166,6 +184,7 @@ function splitFirstStatement(ts: Array<Token|Brackets>):
     if(ts[0].kind === 'let') return splitPreDeclare(ts);
     if(ts[0].kind === 'if') return splitPreIfStatement(ts);
     if(ts[0].kind === 'while') return splitPreWhileLoop(ts);
+    if(ts[0].kind === 'return') return splitPreReturn(ts);
 
     if(ts.length === 1) return[{kind: 'preExpr', val: ts}, []];
     // a single token which thus should be an expression
